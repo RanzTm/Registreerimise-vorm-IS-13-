@@ -1,4 +1,6 @@
 <?php
+date_default_timezone_set("Europe/Tallinn");
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// CREATE //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -9,7 +11,8 @@ function api_user_create($userData) {
     $last_name = $userData["last_name"];
     $gender = $userData["gender"];
     $description = $userData["description"];
-    $profile_pic = $userData["profile_pic"];	
+    $profile_pic = $userData["profile_pic"];
+	$date = $userData["date"];
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	if (!empty($username && $password && $first_name && $last_name && $gender && $description )) { 
         $homePath = "./kasutajad";
@@ -43,6 +46,12 @@ function api_user_create($userData) {
 		if (!empty($profile_pic)) {
 			move_uploaded_file($profile_pic, $imgPath);
             }
+			
+			$timestamp = strtotime(str_replace('/', '-', $date));
+            if ($timestamp === false) {
+                $timestamp = "";
+            }
+			
             $file = fopen($dataPath, "w");
             $data[] = array(
 			"id" => $user_id,
@@ -88,6 +97,7 @@ function api_user_read($user_id) {
     $dataPath = "./kasutajad/$user_id/data.json";
     $json = file_get_contents($dataPath);
     $userData = json_decode($json, true);
+	$userData[0]["date"] = strftime("%d/%m/%Y %H:%M", $userData[0]["date"]);
     return $userData[0];
 }
 
